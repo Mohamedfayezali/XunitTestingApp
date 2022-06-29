@@ -27,7 +27,7 @@ namespace TestedApp.Fanctionality
             if (product.Id == 0)
                 return false;
 
-            _dbService.SaveItemShoppingCart(product);
+            _dbService.SaveItemShoppingCart(product); 
             return true;
         }
         

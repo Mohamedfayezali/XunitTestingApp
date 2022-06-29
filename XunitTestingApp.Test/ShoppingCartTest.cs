@@ -2,8 +2,9 @@
 
 namespace XunitTestingApp.Test
 {
-    public class DbServiceMock : IDbService
-    {
+    public class DbServiceMock : IDbService 
+    { 
+        //fack Service
         public bool ProcessResult {get; set;}
         public Product ProductBeingProcessed {get; set;}
         public int ProductIdBeingProcessed { get; set;}
@@ -12,7 +13,7 @@ namespace XunitTestingApp.Test
             if (prodId == null)
                 return false;
             ProductIdBeingProcessed = Convert.ToInt32(prodId);
-            return true;
+            return ProcessResult;
         }
 
         public bool SaveItemShoppingCart(Product? product)
@@ -20,7 +21,7 @@ namespace XunitTestingApp.Test
             if (product == null)
                 return false;
             ProductBeingProcessed = product;
-            return true;
+            return ProcessResult;
         }
     }
 
@@ -40,6 +41,44 @@ namespace XunitTestingApp.Test
 
             //Assert 
             Assert.True(result);
+            Assert.Equal(result, dbMock.ProcessResult);
+            Assert.Equal("shoes", dbMock.ProductBeingProcessed.Name);
         }
+        [Fact]
+        public void AddProduct_Failure_DueToInvalidPayload()
+        {
+            //Given 
+            var dbMock = new DbServiceMock();
+            dbMock.ProcessResult = false;
+
+            var shoppingCart = new ShoppingCart(dbMock);
+
+            // when 
+            var result = shoppingCart.AddProduct(null);
+
+            //Assert 
+            Assert.False(result);
+            Assert.Equal(result, dbMock.ProcessResult);
+        }
+
+        [Fact]
+        public void RemoveProduct_Success()
+        {
+            //Given
+            var dbMock = new DbServiceMock();
+            dbMock.ProcessResult= true;
+
+            var shoppingCart = new ShoppingCart(dbMock);
+
+            // when 
+            var pro = new Product(1, "any", 222);
+            var result = shoppingCart.DeleteProduct(pro.Id);
+
+            //then
+            Assert.True(result);
+            Assert.Equal(result, dbMock.ProcessResult);
+        }
+
+
     }
 }
