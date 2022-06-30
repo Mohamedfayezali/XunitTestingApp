@@ -19,6 +19,7 @@ namespace XunitTestingApp.Test
             Assert.Equal("Gamal", savedUser.firstName);
             Assert.Equal("Fayez", savedUser.lastName);
             Assert.False(savedUser.VerifiedEmail);
+            
         }
 
         [Fact]

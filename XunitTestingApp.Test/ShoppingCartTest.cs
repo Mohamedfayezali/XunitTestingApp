@@ -1,4 +1,5 @@
-﻿using TestedApp.Fanctionality;
+﻿using Moq;
+using TestedApp.Fanctionality;
 
 namespace XunitTestingApp.Test
 {
@@ -26,14 +27,22 @@ namespace XunitTestingApp.Test
     }
 
     public class ShoppingCartTest
-    { 
+    {
+        private readonly Mock<IDbService> _dbServiceMock;
+
+        public ShoppingCartTest(Mock<IDbService> dbServiceMock)
+        {
+            _dbServiceMock = dbServiceMock;
+        }
         [Fact]
         public void AddProduct_Success()
         {
-            //Given 
-            var dbMock = new DbServiceMock();
-            dbMock.ProcessResult = true;
-            var shoppingCart = new ShoppingCart(dbMock);
+            ////Given 
+            //var dbMock = new DbServiceMock();
+            //dbMock.ProcessResult = true;
+
+            
+            var shoppingCart = new ShoppingCart(_dbServiceMock.Object);
 
             //when
             var product = new Product(1, "shoes", 200);
@@ -41,34 +50,38 @@ namespace XunitTestingApp.Test
 
             //Assert 
             Assert.True(result);
-            Assert.Equal(result, dbMock.ProcessResult);
-            Assert.Equal("shoes", dbMock.ProductBeingProcessed.Name);
+
+            _dbServiceMock.Verify(x => x.SaveItemShoppingCart(It.IsAny<Product>()), Times.Once);
+
+            //Assert.Equal(result, dbMock.ProcessResult);
+            //Assert.Equal("shoes", dbMock.ProductBeingProcessed.Name);
         }
         [Fact]
         public void AddProduct_Failure_DueToInvalidPayload()
         {
             //Given 
-            var dbMock = new DbServiceMock();
-            dbMock.ProcessResult = false;
+            //var dbMock = new DbServiceMock();
+            //dbMock.ProcessResult = false;
 
-            var shoppingCart = new ShoppingCart(dbMock);
+            var shoppingCart = new ShoppingCart(_dbServiceMock.Object);
 
             // when 
             var result = shoppingCart.AddProduct(null);
 
             //Assert 
             Assert.False(result);
-            Assert.Equal(result, dbMock.ProcessResult);
+            _dbServiceMock.Verify(x => x.SaveItemShoppingCart(It.IsAny<Product>()), Times.Never);
+           // Assert.Equal(result, dbMock.ProcessResult);
         }
 
         [Fact]
         public void RemoveProduct_Success()
         {
             //Given
-            var dbMock = new DbServiceMock();
-            dbMock.ProcessResult= true;
+            //var dbMock = new DbServiceMock();
+            //dbMock.ProcessResult= true;
 
-            var shoppingCart = new ShoppingCart(dbMock);
+            var shoppingCart = new ShoppingCart(_dbServiceMock.Object);
 
             // when 
             var pro = new Product(1, "any", 222);
@@ -76,7 +89,8 @@ namespace XunitTestingApp.Test
 
             //then
             Assert.True(result);
-            Assert.Equal(result, dbMock.ProcessResult);
+            _dbServiceMock.Verify(x => x.SaveItemShoppingCart(It.IsAny<Product>()), Times.Once);
+            //Assert.Equal(result, dbMock.ProcessResult);
         }
 
 
